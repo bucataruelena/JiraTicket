@@ -1,0 +1,48 @@
+name: check jira ticket
+
+on:
+  pull_request:
+
+jobs:
+  check-jira-ticket:
+    name: check jira ticket
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Test
+        env:
+          GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
+        run: |
+          ALL_COMMITS=$(\
+            curl -s \
+                 -H "Authorization: token ${{ github.token }}" \
+                 ${{ github.event.pull_request.commits_url }}
+          )
+          INVALID_COMMITS=$(\
+            echo $ALL_COMMITS | \
+              jq '[ .[] | select(
+                    (.commit.author.email | endswith("@visma.com") | not)
+                and (.commit.author.email | endswith("@users.noreply.github.com") | not)
+                and (.commit.author.email == "teamcity@e-conomic.com" | not)
+                and (.commit.author.email == "opsteam@e-conomic.com" | not)
+              ) ]' \
+          )
+          INVALID_COUNT=$(\
+            echo $INVALID_COMMITS | jq '. | length'
+          )
+          if [[ $INVALID_COUNT -gt 0 ]]
+          then
+            echo $INVALID_COMMITS | \
+              jq '.[] |
+                "[FAIL]: \(.sha) is authored with email: \(.commit.author.email) - please amend with your @visma.com email"'
+            exit 1
+          else
+            echo All commits have valid email addresses
+            echo $ALL_COMMITS | \
+              jq '.[] |
+                "(valid): \(.sha) is authored with email: \(.commit.author.email)"'
+          fi
