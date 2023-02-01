@@ -15,5 +15,5 @@ jobs:
 
       - name: Test
         env:
-          GITHUB_CONTEXT: ${{ toJSON(github.event.pull_request.commits_url) }}
+          GITHUB_CONTEXT: ${{ toJSON(github.event.pull_request) }}
         run: echo "$GITHUB_CONTEXT"
