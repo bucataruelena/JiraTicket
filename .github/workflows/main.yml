@@ -15,7 +15,7 @@ jobs:
 
       - name: Test
         env:
-          GITHUB_CONTEXT: ${{ github.event.pull_request }}
+          GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
         run: |
           ALL_COMMITS=$(\
             curl -s \
