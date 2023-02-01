@@ -28,5 +28,15 @@ jobs:
                     (.commit.message | startswith("EC"))
               ) ]' \
           )
-          echo $INVALID_COMMITS | jq '. | length'
-          echo $INVALID_COMMITS | jq
+          INVALID_COUNT=$(\
+            echo $INVALID_COMMITS | jq '. | length'
+          )
+          if [[ $INVALID_COUNT -gt 0 ]]
+          then
+            echo $INVALID_COMMITS | \
+              jq '.[] |
+                "[FAIL]: \(.sha) please add a Jira ticket"'
+            exit 1
+          else
+            echo All commits contain a Jira ticket
+          fi
