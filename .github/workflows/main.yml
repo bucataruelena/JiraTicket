@@ -16,4 +16,17 @@ jobs:
       - name: Test
         env:
           GITHUB_CONTEXT: ${{ github.event.pull_request }}
-        run: echo "$GITHUB_CONTEXT"
+        run: |
+          ALL_COMMITS=$(\
+            curl -s \
+                 -H "Authorization: token ${{ github.token }}" \
+                 ${{ github.event.pull_request.commits_url }}
+          )
+          INVALID_COMMITS=$(\
+            echo $ALL_COMMITS | \
+              jq '[ .[] | select(
+                    (.commit.message)
+              ) ]' \
+          )
+          echo $INVALID_COMMITS | jq '. | length'
+          echo $INVALID_COMMITS | jq
