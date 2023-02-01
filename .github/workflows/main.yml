@@ -25,7 +25,7 @@ jobs:
           INVALID_COMMITS=$(\
             echo $ALL_COMMITS | \
               jq '[ .[] | select(
-                    (.commit.message | startswith("EC") | not)
+                    (.commit.message | startswith("EC"))
               ) ]' \
           )
           echo $INVALID_COMMITS | jq '. | length'
