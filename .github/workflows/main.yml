@@ -24,8 +24,8 @@ jobs:
           )
           INVALID_COMMITS=$(\
             echo $ALL_COMMITS | \
-              jq '[ .[] | select(
-                    (.commit.message =~ ^[0-9] | not)
+              jq '[ .[] | select( \
+                    (.commit.message =~ '^(EC|SRE)-[0-9]+\s' | not) \
               ) ]' \
           )
           INVALID_COUNT=$(\
