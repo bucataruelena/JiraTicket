@@ -1,0 +1,37 @@
+name: check jira ticket
+
+on:
+  pull_request:
+
+jobs:
+  check-jira-ticket:
+    name: check jira ticket
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Test
+        env:
+          GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
+        run: |
+          ALL_COMMITS=$(\
+            curl -s \
+                 -H "Authorization: token ${{ github.token }}" \
+                 ${{ github.event.pull_request.commits_url }}
+          )
+          INVALID_COMMITS=$(echo $ALL_COMMITS | jq '[ .[] | select(.commit.message | test("^(EC|SRE)-[0-9]+\s") | not) ]')
+          INVALID_COUNT=$(\
+            echo $INVALID_COMMITS | jq '. | length'
+          )
+          if [[ $INVALID_COUNT -gt 0 ]]
+          then
+            echo $INVALID_COMMITS | \
+              jq '.[] |
+                "[FAIL]: \(.sha) please add a Jira ticket"'
+            exit 1
+          else
+            echo All commits contain a Jira ticket
+          fi
