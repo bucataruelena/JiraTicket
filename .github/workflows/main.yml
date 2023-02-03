@@ -1,11 +1,11 @@
-name: check jira ticket
+name: Jira Ticket Checker
 
 on:
   pull_request:
 
 jobs:
   check-jira-ticket:
-    name: check jira ticket
+    name: Validate commits
     runs-on: ubuntu-latest
     timeout-minutes: 2
 
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Test
+      - name: Check jira ticket in commits messages
         env:
           GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
         run: |
