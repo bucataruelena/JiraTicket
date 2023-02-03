@@ -22,7 +22,7 @@ jobs:
                  -H "Authorization: token ${{ github.token }}" \
                  ${{ github.event.pull_request.commits_url }}
           )
-          INVALID_COMMITS=$(echo $ALL_COMMITS | jq '[ .[] | select(.commit.message | test("^(EC|SRE)-[0-9]+\s") | not) ]')
+          INVALID_COMMITS=$(echo $ALL_COMMITS | jq '[ .[] | select(.commit.message | test("^(EC|SRE)-[0-9]+ ") | not) ]')
           INVALID_COUNT=$(\
             echo $INVALID_COMMITS | jq '. | length'
           )
@@ -30,7 +30,7 @@ jobs:
           then
             echo $INVALID_COMMITS | \
               jq '.[] |
-                "[FAIL]: \(.sha) please add a Jira ticket"'
+                "[FAIL]: please add a Jira ticket for \(.sha) "'
             exit 1
           else
             echo All commits contain a Jira ticket
