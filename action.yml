@@ -1,0 +1,32 @@
+name: Jira Ticket Checker
+
+inputs: 
+  tags:
+    required: true
+
+runs: 
+    using: "composite"
+    steps:
+      - name: Check jira ticket in commits messages
+        env:
+          GITHUB_CONTEXT: ${{ github.event.pull_request.commits_url }}
+          INPUT_TAGS: ${{ inputs.tags }}
+        run: |
+          ALL_COMMITS=$(\
+            curl -s \
+                 -H "Authorization: token ${{ github.token }}" \
+                 ${{ github.event.pull_request.commits_url }}
+          )
+          INVALID_COMMITS=$(echo $ALL_COMMITS | jq '[ .[] | select((.commit.message | test("^($INPUT_TAGS)-[0-9]+ ") | not) and (.parents | length) == 1) ]')
+          INVALID_COUNT=$(\
+            echo $INVALID_COMMITS | jq '. | length'
+          )
+          if [[ $INVALID_COUNT -gt 0 ]]
+          then
+            echo $INVALID_COMMITS | \
+              jq '.[] |
+                "[FAIL]: Please add a Jira ticket for the following commit \(.sha)."'
+            exit 1
+          else
+            echo All commits contain a Jira ticket.
+          fi
