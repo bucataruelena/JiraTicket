@@ -16,4 +16,4 @@ jobs:
       - name: Check jira ticket in commits messages
         uses: bucataruelena/CompositeAction@v2
         with: 
-          tags: "EC|SRE"
+          tags: "^(EC|SRE)-[0-9]+ "
