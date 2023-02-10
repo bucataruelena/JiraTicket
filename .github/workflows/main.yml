@@ -16,4 +16,4 @@ jobs:
       - name: Check jira ticket in commits messages
         uses: CompositeAction/composite
         with: 
-          tags: {"EC", "SRE"}
+          tags: "EC|SRE"
