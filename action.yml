@@ -30,3 +30,26 @@ runs:
           else
             echo All commits contain a Jira ticket.
           fi
+          
+          
+         3333333333333333333333333
+         
+         name: Jira Ticket Checker
+
+on:
+  pull_request:
+
+jobs:
+  check-jira-ticket:
+    name: Validate commits
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check jira ticket in commits messages
+        uses: bucataruelena/CompositeAction@v2
+        with: 
+          tags: "^(EC|SRE)-[0-9]+ "
